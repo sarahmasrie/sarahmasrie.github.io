@@ -1,216 +1,134 @@
-"use strict";
-// IIFE - Immediately invoked functional expression
-
 (function(){
+
+    function changeLinkText() {
+        console.log("changeLinkText function called");
+        let blogLink = $('#blog');
+
+        if (blogLink.length) {
+            console.log("Element with id 'blog' found");
+            blogLink.text('News');
+        } else {
+            console.log("Element with id 'blog' not found");
+        }
+    }
 
     function CheckLogin(){
         if(sessionStorage.getItem("user")){
             $("#login").html(`<a id="logout" class="nav-link" href="#"><i class="fas fa-undo"></i> Logout</a>`);
         }
-        $("#Logout").on("click", function(){
+        $("#logout").on("click", function(){
             sessionStorage.clear();
-            location.href = "index.html";
+            location.href="index.html";
         });
     }
 
-    function LoadHeader(html_Data){
-        $("header").html(html_Data);
+    function SearchFunctionality() {
+        $("#searchButton").on("click", function() {
+            const searchTerm = $("#searchInput").val().toLowerCase();
+            // Perform search logic here
+            console.log("Search term:", searchTerm);
+            // For testing, just log the search term
+        });
+    }
+
+    function LoadHeader(html_header){
+        $("header").html(html_header);
         $(`li>a:contains(${document.title})`).addClass("active").attr("aria-current", "page");
         CheckLogin();
-    }
-    function AjaxRequest(method, url, callback){
-        // Step 1: Initialize ZHR Object
-        let xhr = new XMLHttpRequest();
-        // Step 2: Open a connection to the server
-        xhr.open(method, url);
-        // Step 4: Add the event listener to monitor the readystatechange
-        xhr.addEventListener("readystatechange", () => {
+        changeLinkText();
 
-            if(xhr.readyState === 4 && xhr.status === 200) {
-                if (typeof callback == "function") {
+        // Call SearchFunctionality on pages where search is required
+        if (document.title === "Blog" || document.title === "Gallery" || document.title === "Events") {
+            SearchFunctionality();
+        }
+    }
+
+    function LoadFooter(html_footer){
+        $("footer").html(html_footer);
+    }
+
+    function AjaxRequest(method, url, callback){
+        let xhr = new XMLHttpRequest();
+        xhr.open(method, url,true);
+        xhr.addEventListener("readystatechange", ()=>{
+            if(xhr.readyState === 4 && xhr.status === 200){
+                if(typeof callback == "function"){
                     callback(xhr.responseText);
-                } else {
-                    console.error("ERROR: Callback not a function");
+                }else{
+                    console.error("Error: callback not a function");
                 }
             }
         });
-        // Step 3: Send the request
         xhr.send();
     }
 
-    function ContactFormValidation(){
-        //fullName
-        ValidateField("#fullName",
-            /^([A-Z][a-z]{1,3}\.?\s)?([A-Z][a-z]+)+([\s,-]([A-z][a-z]+))*$/,
-            "Please enter a valid First and Last name.");
-        ValidateField("#contactNumber",
-            /^([A-Z][a-z]{1,3}\.?\s)?([A-Z][a-z]+)+([\s,-]([A-z][a-z]+))*$/,
-            "Please enter a valid contact phone number.")
-        ValidateField("#emailAddress",
-            /^([A-Z][a-z]{1,3}\.?\s)?([A-Z][a-z]+)+([\s,-]([A-z][a-z]+))*$/,
-            "Please enter a valid email address.")
-    }
-    /**
-     * Test Regular Expression for Full Name Input
-     * @constructor
-     */
-
-    /**
-     * This function validates input for contact and edit pages.
-     * @param input_field_id
-     * @param regular_expression
-     * @param error_message
-     */
-    function ValidateField(input_field_id, regular_expression, error_message){
-        let messageArea = $("#messageArea").hide();
-        $(input_field_id).on("blur", function(){
-            let inputFieldText = $(this).val();
-            if(!regular_expression.test(inputFieldText)){
-                $(this).trigger("focus").trigger("select");
-                messageArea.addClass("alert alert-danger").text(error_message).show();
-            }
-            else{
-                messageArea.removeClass("class").hide();
-            }
-        });
-    }
-    function AddContact(fullName, contactNumber, emailAddress){
-        let contact = new core.Contact(fullName.value, contactNumber.value, emailAddress.value);
-        if (contact.serialize()){
-            let key = contact.fullName.substring(0,1) + Date.now();
-            localStorage.setItem(key, contact.serialize());
-        }
-    }
-    function DisplayHomePage(){
-        console.log("Called DisplayHomePage...");
-        $("#AboutUs").on("click", ()=>{
-            location.href = "about.html";
-        });
-
-        $("main").append(`<p id ="MainParagraph" class="mt-3">This is my first paragraph</p>`);
-        $("body").append(`<article class="container">
-                            <p id="ArticleParagraph" class="mt-3">This is my article paragraph</p></article>`)
-    }
-    function DisplayAboutPage(){
-        console.log("Called DisplayAboutPage...");
-    }
-    function DisplayContactPage(){
-        console.log("Called DisplayContactPage...");
-        ContactFormValidation();
-        let sendButton = document.getElementById("sendButton");
-        let subscribeCheckbox = document.getElementById("subscribeCheckBox");
-        sendButton.addEventListener("click", function(){
-            if(subscribeCheckbox.checked){
-                AddContact(fullName.value, contactNumber.value, emailAddress.value);
-            }
-        });
-    }
-    function DisplayContactListPage() {
-        console.log("Called DisplayContactListPage...");
-        if (localStorage.lengt > 0) {
-            let contactList = document.getElementById("contactList");
-            let data = "";
-            let index = 1;
-            let keys = Object.keys(localStorage);
-
-            for (const key of keys) {
-                let contact = new Contact();
-                let contactData = localStorage.getItem(key);
-                contact.deserialize(contactData);
-                data += `<tr><th scope="row" class="text-center">${index}</th>
-                         <td>${contact.fullName}</td>
-                         <td>${contact.contactNumber}</td>
-                         <td>${contact.emailAddress}</td>
-                         <td>
-                            <button value="${key}" class="btn btn-primary btn-sm edit">
-                                <i class="fas fa-edit fa-sm"> Edit</i>
-                            </button>
-                         </td>
-                         <td>
-                            <button value="${key}" class="btn btn-danger btn-sm delete"></button>
-                                <i class="fas fa-trash fa-sm"> Delete</i>
-                            </button>
-                         </td>
-                         </tr>`;
-                index++;
-            }
-            contactList.innerHTML = data;
-        }
-        $("#addButton").on("click", () => {
-            location.href = "edit.html#add";
-        });
-        $("button.edit").on("click", function () {
-            location.href = "edit.html#" + $(this).val();
-        });
-        $("button.delete").on("click", function () {
-            if (confirm("Confirm contact Delete?")) {
-                localStorage.removeItem($(this).val());
-                location.href = "contact-list.html";
-            }
-        })
-    }
-
-    function DisplayProductPage(){
-        console.log("Called DisplayProductPage...");
-    }
-
-    function DisplayServicePage(){
-        console.log("Called DisplayServicePage...");
-    }
-
-    function DisplayEditPage(){
-        ContactFormValidation();
-        console.log("Called DisplayEditPage...");
-        let page =location.hash.substring(1);
-        switch(page){
-            case "add":
-                $("main>h1").text("Add Contact");
-                $("#editButton").html(`<i class="fa fa-plus fa-sm">Add`);
-                $("#editButton").on("click", (event) => {
-                    event.preventDefault();
-                    AddContact(fullName.value, contactNumber.value, emailAddess.value);
-                    location.href = "contact-list.html";
-                });
-                $("#cancelButton").on("click", () =>{
-                    location.href = "contact-list.html";
-                });
+    function Start(){
+        console.log("App Started...");
+        AjaxRequest("GET", "header.html", LoadHeader);
+        AjaxRequest("GET", "footer.html", LoadFooter);
+        switch(document.title){
+            case "Home":
+                DisplayHomePage();
                 break;
-            default:
-                // Edit operation
-                let contact = new core.Contact();
-                contact.deserialize(localStorage.getItem(page));
-                // Display the contact info
-                $("#fullName").val(contact.fullName);
-                $("#contactNumber").val(contact.contactNumber);
-                $("#emailAddress").val(contact.emailAddress);
-
-                // Prevent form submission
-                $("#editButton").on("click", (event) =>{
-                    event.preventDefault();
-                    contact.fullName = $("#fullName").value();
-                    contact.contactNumber = $("#contactNumber").val();
-                    contact.emailAddress = $("#emailAddress").val();
-
-                    localStorage.setItem(page, contact.serialize());
-                    location.href = "contact-list.html";
-                });
-
-                $("#cancelButton").on("click", () =>{
-                    location.href = "contact-list.html";
-                });
+            case "Blog":
+                DisplayBlogPage();
                 break;
+            case "Contact":
+                DisplayContactPage();
+                break;
+            case "Portfolio":
+                DisplayPortfolioPage();
+                break;
+            case "Privacy":
+                DisplayPrivacyPage();
+                break;
+            case "Services":
+                DisplayServicesPage();
+                break;
+            case "Team":
+                DisplayTeamPage();
+                break;
+            case "Terms of Service":
+                DisplayTOSPage();
+                break;
+            case "Login":
+                DisplayLoginPage();
+                break;
+            case "Registration":
+                DisplayRegPage();
+                break;
+            case "Events":
+                DisplayEventPage();
         }
     }
+    window.addEventListener("load", Start);
 
+
+    function AddUser(firstName, lastName, username, emailAddress, password){
+        let user = new core.User(firstName, lastName, username, emailAddress, password);
+        if(user.serialize()){
+            let key = user.username.substring(0,1) + Date.now();
+            localStorage.setItem(key, user.serialize());
+        }
+    }
+    function DisplayRegPage(){
+        console.log("Called DisplayRegPage");
+        RegistrationFormValidation();
+        let sentButton = document.getElementById("sendButton");
+        sentButton.addEventListener("click", function (){
+            event.preventDefault();
+            AddUser(firstName.value, lastName.value, username.value, emailAddress.value, password.value);
+            location.href = "index.html";
+        });
+    }
     function DisplayLoginPage(){
         console.log("Called DisplayLoginPage...");
-        let messageArea = $("#messageArea");
+        let messageArea = $("messageArea");
         $("#loginButton").on("click", function(){
-
             let success = false;
             let newUser = new core.User();
 
-            $.get("./data/users/.json", function(data){
+            $.get("./data/users.json", function(data){
                 for(const user of data.users){
                     console.log(user);
                     if(username.value === user.Username && password.value === user.Password){
@@ -222,55 +140,319 @@
                 if(success){
                     sessionStorage.setItem("user", newUser.serialize());
                     messageArea.removeAttr("class").hide();
-                    location.href = "contact-list.html"
+                    location.href = "index.html";
+
                 }else{
                     $("#username").trigger("focus").trigger("select");
-                    messageArea.addClass("alert alert-danger").text("Error: Invalid Credentials").show();
+                    messageArea
+                        .addClass("alert alert-danger")
+                        .text("Error: Invalid Credentials")
+                        .show();
                 }
             });
-
-        });
-        $("#cancelButton").on("click", function(){
-            document.forms[0].rest();
+        });/*
+        $("#cancelButton").on("click", function (){
+            document.forms[0].reset();
             location.href = "index.html";
-        })
+        });
+        */
     }
-    function DisplayRegisterPage(){
-        console.log("Called DisplayRegisterPage...");
+
+
+
+    function DisplayHomePage(){
+        console.log("Called DisplayHomePage...");
+
+        let serializedUser = sessionStorage.getItem("user");
+        if (serializedUser) {
+            let user = new core.User();
+            user.deserialize(serializedUser);
+
+            // Display greeting message with user's name
+            $("#greetingMessage").text("Welcome, " + user.displayName+ "!");
+        }
+        let slideIndex = 0;
+        showSlides(slideIndex);
     }
-    function Start(){
-        console.log("App Started...");
-        AjaxRequest("GET", "header.html", LoadHeader);
-        switch(document.title){
-            case "Home":
-                DisplayHomePage();
-                break;
-            case "Product":
-                DisplayProductPage();
-                break;
-            case "About Us":
-                DisplayAboutPage();
-                break;
-            case "Contact Us":
-                DisplayContactPage();
-                break;
-            case "Services":
-                DisplayServicePage();
-                break;
-            case "Contact List":
-                DisplayContactListPage();
-                break;
-            case "Edit List":
-                DisplayContactListPage();
-                break;
-            case "Login":
-                DisplayLoginPage();
-                break;
-            case "Register":
-                DisplayRegisterPage();
-                break;
+    let slideIndex = 0;
+
+    function showSlides(slideIndex) {
+        let i;
+        const slides = document.getElementsByClassName("slide-home");
+        const dots = document.getElementsByClassName("dot");
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        slideIndex++;
+        if (slideIndex > slides.length) { slideIndex = 1 }
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+            (function (index) {
+                dots[i].addEventListener("click", function () {
+                    currentSlide(index);
+                });
+            })(i);
+        }
+        slides[slideIndex - 1].style.display = "block";
+        dots[slideIndex - 1].className += " active";
+        setTimeout(function() { showSlides(slideIndex); }, 3000);
+    }
+
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+    function DisplayBlogPage(){
+        console.log("Called DisplayBlogPage...");
+
+
+        AjaxRequest("GET", "./data/blogposts.json", LoadBlogs);
+
+    }
+
+    function LoadBlogs(data) {
+        let parsed = JSON.parse(data);
+        let postGrid = $("#preview-articles");
+        let row = $('<div class="row">');
+
+        $.each(parsed, function (index, postData) {
+            let blogPost = new core.BlogPost();
+            blogPost.fromJSON(postData);
+            let $newPost = $('<div class="col-md-4">');
+
+            $newPost.html(`
+            <article class="mb-4 m-1 p-1">
+                <img src="${blogPost.imageUrl}" alt="${blogPost.title}">
+                <h2 class="m-1 p-1">${blogPost.title}</h2>
+                <p class="m-1 p-1">${blogPost.preview}</p>
+                <a href="#" class="btn btn-primary m-1 p-1">Read More</a>
+            </article>
+        `);
+            row.append($newPost);
+            if ((index + 1) % 3 === 0) {
+                postGrid.append(row);
+                row = $('<div class="row">');
+            }
+        });
+        if (parsed.length % 3 !== 0) {
+            postGrid.append(row);
         }
     }
-    window.addEventListener("load", Start);
 
-})()
+    function LoadEvents(data){
+        let parsed = JSON.parse(data);
+        let eventGrid = $("#event-grid");
+        $.each(parsed, function(index, eventData){
+           let eventPost = new core.Event();
+           eventPost.fromJSON(eventData);
+           let $newPost = $('<div>');
+           $newPost.addClass('container');
+           $newPost.html(`<div class="container border rounded m-3 p-2">
+<img src="${eventPost.imageUrl}" alt="${eventPost.title}">
+                        <h2>${eventPost.title}</h2>
+                        <h5>${eventPost.date} @ ${eventPost.location}</h5>
+                        <p>${eventPost.description}</p>
+</div>`);
+           eventGrid.append($newPost);
+        });
+    }
+
+    function DisplayEventPage(){
+        console.log("Called DisplayEventPage");
+        AjaxRequest("GET", "./data/events.json", LoadEvents);
+    }
+
+
+    function DisplayContactPage(){
+        console.log("Called DisplayContactPage...");
+        document.addEventListener("click", function() {
+            // Add event listener to form submission
+            document.getElementById("contactForm").addEventListener("submit", function(event) {
+                console.log("FORM SUBMITTED");
+                event.preventDefault(); // Prevent form submission
+                // Get form data
+                const name = document.getElementById("name").value;
+                const email = document.getElementById("email").value;
+                const subject = document.getElementById("subject").value;
+                const message = document.getElementById("message").value;
+                const reason = document.getElementById("reason").value; // New dropdown menu value
+
+                // Update modal content with user feedback
+                const userFeedback = document.getElementById("userFeedback");
+                userFeedback.innerHTML = "<strong>Name:</strong> " + name + "<br>" +
+                    "<strong>Email:</strong> " + email + "<br>" +
+                    "<strong>Subject:</strong> " + subject + "<br>" +
+                    "<strong>Reason:</strong> " + reason  + "<br>" +
+                    "<strong>Message:</strong> " + message;
+
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('reg-modal'));
+                modal.show();
+
+                // Redirect after 5 seconds
+                setTimeout(function() {
+                    window.location.href = "/index.html"; // Replace with your desired URL
+                }, 5000); // 5000 milliseconds = 5 seconds
+            });
+        });
+
+
+    }
+    function DisplayPortfolioPage(){
+        console.log("Called DisplayPortfolioPage...");
+        loadProjects();
+        loadMoreBtn.addEventListener('click', loadProjects);
+    }
+    const projects = [
+        { title: 'Project 1', description: 'Description for Project 1', imageUrl: './images/proj.jpg' },
+        { title: 'Project 2', description: 'Description for Project 2', imageUrl: './images/proj.jpg' },
+        { title: 'Project 3', description: 'Description for Project 3', imageUrl: './images/proj.jpg' },
+        { title: 'Project 4', description: 'Description for Project 4', imageUrl: './images/proj.jpg' },
+
+    ];
+
+    const projectsContainer = document.getElementById('projects-container');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    let projectsPerPage = 3;
+    let currentIndex = 0;
+    function createProjectCard(project) {
+        const card = document.createElement('div');
+        card.classList.add('project-card');
+
+        const title = document.createElement('h3');
+        title.textContent = project.title;
+
+        const description = document.createElement('p');
+        description.textContent = project.description;
+
+        const image = document.createElement('img');
+        image.src = project.imageUrl;
+        image.alt = project.title;
+
+        card.appendChild(title);
+        card.appendChild(description);
+        card.appendChild(image);
+
+        projectsContainer.appendChild(card);
+    }
+    function loadProjects() {
+        for (let i = 0; i < projectsPerPage; i++) {
+            if (currentIndex < projects.length) {
+                createProjectCard(projects[currentIndex]);
+                currentIndex++;
+            } else {
+                loadMoreBtn.style.display = 'none';
+                break;
+            }
+        }
+    }
+
+    function DisplayPrivacyPage(){
+        console.log("Called DisplayPrivacyPage...");
+    }
+    function DisplayServicesPage(){
+        console.log("Called DisplayServicesPage...");
+    }
+    function DisplayTeamPage(){
+        console.log("Called DisplayTeamPage...");
+    }
+    function DisplayTOSPage(){
+        console.log("Called DisplayTOSPage...");
+    }
+
+})();
+var slideIndex = 1;
+showSlides(slideIndex);
+
+function openModal() {
+    document.getElementById('myModal').style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById('myModal').style.display = "none";
+}
+
+function plusSlides(n) {
+    showSlides(slideIndex += n);
+}
+
+function currentSlide(n) {
+    showSlides(slideIndex = n);
+}
+
+function showSlides(n) {
+    var i;
+    var slides = document.getElementsByClassName("mySlides");
+    var captionText = document.getElementById("caption");
+    var slideNumber = document.getElementsByClassName("slide-number");
+
+    if (n > slides.length) { slideIndex = 1 }
+    if (n < 1) { slideIndex = slides.length }
+
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    slides[slideIndex - 1].style.display = "block";
+    slideNumber.innerHTML = slideIndex + " / " + slides.length; // Update image number
+}
+
+
+// Get the modal overlay
+var modalOverlay = document.getElementById("myModal");
+
+// Close the modal if the user clicks outside of the modal content
+modalOverlay.addEventListener("click", function(event) {
+    if (event.target === modalOverlay) {
+        closeModal();
+    }
+});
+
+function initMap() {
+    // Used Durham College address for Harmony Hub
+    const harmonyHubLocation = { lat:43.94524566723868, lng: -78.89483608988557 };
+
+    // The map, centered at your business location
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: harmonyHubLocation,
+    });
+
+    // The marker, positioned at your business location
+    const marker = new google.maps.Marker({
+        position: harmonyHubLocation,
+        map: map,
+    });
+    google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
+        let clicks = 0;
+        let timer = null;
+        document.getElementById("map").addEventListener("click", function() {
+             clicks++;
+            if (clicks === 3) {
+                // Reset the size of the map
+                document.getElementById("map").style.width = "40%";
+                document.getElementById("map").style.height = "53%";
+                clicks = 0;
+            }
+        //     if (clicks === 1) {
+        //         timer = setTimeout(function() {
+        //             clicks = 0;
+        //         }, 5); // Change the delay as needed for detecting a double click
+        //     } else if (clicks === 3) {
+        //         clearTimeout(timer);
+        //         timer = null;
+        //         clicks = 0;
+        //         // Make the map draggable
+        //         $("#map").draggable();
+        //     }
+         });
+        // Make the map draggable using jQuery UI
+        //$("#map").draggable();
+
+        // Make the map resizable using jQuery UI
+        $("#map").resizable({
+            resize: function(event, ui) {
+                // Trigger the Google Maps resize event when the container is resized
+                google.maps.event.trigger(map, 'resize');
+            }
+        });
+    });
+}

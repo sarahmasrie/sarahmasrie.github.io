@@ -1,75 +1,63 @@
-"use strict";
 
-let core = {}; // Define core before using it
 
-(function(core) {
-    class Contact {
-        constructor(fullName = "", contactNumber = "", emailAddress = "") {
-            this._fullName = fullName;
-            this._contactNumber = contactNumber;
-            this._emailAddress = emailAddress;
-        }
+function timedRedirect(){
+    setTimeout(redirectURL, 2000)
+    let result = document.getElementById("contactResult");
+    result.innerHTML="<b> This page will redirect in 5 seconds</b>"
 
-        get fullName() {
-            return this._fullName;
-        }
+}
 
-        set fullName(value) {
-            this._fullName = value;
-        }
+function redirectURL(){
+    document.location.href = "./index.html";
+}
 
-        get contactNumber() {
-            return this._contactNumber;
-        }
+function contactModal(name, email, subject, message){
+    let form = document.getElementById("contactForm");
 
-        set contactNumber(value) {
-            this._contactNumber = value;
-        }
+    if(form.checkValidity()) {
+        let userName = document.getElementById("name").value;
+        let userEmail = document.getElementById("email").value;
+        let userSubject = document.getElementById("subject").value;
+        let userMessage = document.getElementById("message").value;
 
-        get emailAddress() {
-            return this._emailAddress;
-        }
+        let modal = document.getElementById("modal");
+        //let modalBody = document.getElementById("modal-body");
 
-        set emailAddress(value) {
-            this._emailAddress = value;
-        }
+        modal.style.display = 'block';
+        document.getElementById("modalUserName").innerHTML = "<b>Name:</b> " + userName;
+        document.getElementById("modalUserEmail").innerHTML = "<b>Email:</b> " + userEmail;
+        document.getElementById("modalUserSubject").innerHTML = "<b>Subject:</b> " + userSubject;
+        document.getElementById("modalUserMessage").innerHTML = "<b>Message:</b> " + userMessage;
 
-        toString() {
-            return `FullName: ${this._fullName}\n ContactNumber: ${this._contactNumber}\n EmailAddress: ${this._emailAddress}\n`;
-        }
+        //let data = document.createElement('p');
 
-        /**
-         * Serialize for writing to local storage.
-         * @returns {null|string}
-         */
-        serialize() {
-            if (this._fullName !== "" && this._contactNumber !== "" && this._emailAddress !== "") {
-                return `${this.fullName}, ${this.contactNumber}, ${this.emailAddress}`;
-            } else {
-                console.error("One or more properties of the Contact are empty or invalid");
-                if (this._fullName === "") {
-                    console.error("Full Name is empty");
-                }
-                if (this._contactNumber === "") {
-                    console.error("Contact Number is empty");
-                }
-                if (this._emailAddress === "") {
-                    console.error("Email Address is empty");
-                }
-                return null;
-            }
-        }
+        // let displayMessage = `
+        // Name: ${userName}
+        // Email: ${userEmail}
+        // Subject: ${userSubject}
+        // Message: ${userMessage}
+        // `;
+    //     modal.style.display = 'block';
+    //     .textContent = displayMessage;
+    //     modalBody.appendChild(description);
+    //     for (let element of form.elements){
+    //         if(element.type !== "button"){
+    //             element.value = "";
+    //         }
+    //     }
+    // }else{
+    //     alert("Form has empty fields.");
+     }
+}
+function closeModal() {
+    const modal = document.getElementById('modal');
+    modal.style.display = 'none';
+}
 
-        /**
-         * Deserialize is used to read data from localStorage.
-         * @param data
-         */
-        deserialize(data) {
-            let propertyArray = data.split(",");
-            this._fullName = propertyArray[0];
-            this._contactNumber = propertyArray[1];
-            this._emailAddress = propertyArray[2];
-        }
+window.onclick = function (event) {
+    const modal = document.getElementById('modal');
+    if (event.target === modal) {
+        closeModal();
+        timedRedirect();
     }
-    core.Contact = Contact;
-})(core || (core = {}));
+};
