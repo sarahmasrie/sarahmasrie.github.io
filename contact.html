@@ -2,63 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="author" content="Sarah Masrie">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <!--<meta http-equiv="">-->
     <title>Contact</title>
-
     <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.css">
     <link rel="stylesheet" href="./content/app.css">
-
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
-
 <body>
-<header>
+<header></header>
 
-</header>
 <div class="container">
-    <h1><i class="mb-5"></i> Contact</h1>
-    <div id="messageArea"></div>
-    <div class="row justify-content-lg-center g-3">
-    <form class="col-lg-6 col-md-10 col-sm-10">
-        <div class="input-group mb-3">
-            <span class="input-group-text">Full Name</span>
-            <input id="fullName" name="fullName" type="text" class="form-control"
-                   aria-describedby="Full Name" aria-label="Full Name Input" required>
+    <form id="contactForm">
+        <h3 class="mb-5">Contact Us</h3>
+        <div class="mb-3">
+            <input type="text" id="name" placeholder="Name" required>
         </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text">Contact Number</span>
-            <input id="contactNumber" name="contactNumber" type="tel" class="form-control"
-                   aria-describedby="Contact Number" aria-label="Contact Number Input" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="subject" placeholder="Subject" required>
+        <div class="mb-3">
+            <select id="reason" required>
+                <option value="" disabled selected>Select Reason</option>
+                <option value="questions_or_concerns">Questions or Concerns</option>
+                <option value="feedback">Feedback</option>
+                <option value="other">Other</option>
+            </select>
         </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text">Email Address</span>
-            <input id="emailAddress" name="emailAddress" type="email" class="form-control"
-                   aria-describedby="Email Address" aria-label="Email Address Input" required>
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text">Your Message</span>
-            <input id="message" name="message" class="form-control"
-                   aria-describedby="Message Area" aria-label="Message Area Input">
-        </div>
-        <div class="form-check">
-            <input id=subscribeCheckBox type="checkbox" class="form-check-input">
-            <label class="form-check-label" for="subscribeCheckBox">Subscribe to our contact list</label>
-        </div>
-        <button id="sendButton" type="submit" class="btn btn-primary"><i class="fa-solid fa-envelope"></i>Submit</button>
-        <button id="cancelButton" type="reset" class="btn btn-warning"><i class="fa-solid fa-rotate"></i>Cancel</button>
+        <textarea id="message" rows="5" cols="45" placeholder="Enter your message here!" required></textarea>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-envelope"></i> Send</button>
     </form>
-        <div class="col-lg-4 col-md-4">
-            <a href="contact-list.html" class="btn btn-primary"><i class="fa-solid fa-users"></i> Show Contact List</a>
+</div>
+<div class="col-md-6">
+    <div id="map" class="custom-map"></div>
+</div>
+<!-- modal -->
+<div class="modal fade" id="reg-modal" tabindex="=1" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Feedback</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your feedback is important to us. We will return your message as soon as possible</p>
+                <div id="userFeedback"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
         </div>
     </div>
 </div>
 
+
+
+<div class="last-element-above-footer"></div>
+<footer></footer>
+
+<!-- Include the Google Maps JavaScript API Loader -->
 <script src="./node_modules/jquery/dist/jquery.min.js"></script>
 <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="./scripts/contact.js"></script>
 <script src="./scripts/app.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARuAUbS2RWUEh11vA5i35U3dLYA9R84CQ
+             &callback=initMap" async defer></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </body>
 </html>
